@@ -10,6 +10,14 @@ ifneq ($(words $(aicwf_cfg80211_version)),3)
 $(error CFG80211_VERSION must have the form major.minor.patch)
 endif
 ccflags-y += '-DAICWF_CFG80211_VERSION_CODE=KERNEL_VERSION($(word 1,$(aicwf_cfg80211_version)),$(word 2,$(aicwf_cfg80211_version)),$(word 3,$(aicwf_cfg80211_version)))'
+else
+# Distribution kernels may backport cfg80211 API changes without changing
+# their version, e.g. Ubuntu 6.8.0-147 reports 6.8.12 but has the 6.13
+# set_monitor_channel() prototype. Check the kernel's own header for it.
+aicwf_cfg80211_h := $(srctree)/include/net/cfg80211.h
+ifneq ($(shell awk '/\(\*set_monitor_channel\)/,/;/' $(aicwf_cfg80211_h) 2>/dev/null | grep -c 'struct net_device'),0)
+ccflags-y += -DAICWF_CFG80211_SET_MONITOR_CHANNEL_DEV_DETECTED
+endif
 endif
 
 RWNX_VERS_NUM := 6.4.3.0
