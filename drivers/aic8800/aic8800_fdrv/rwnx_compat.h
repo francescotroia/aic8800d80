@@ -45,8 +45,15 @@
  * covers both the backport and mainline, and leaves 6.11 and earlier
  * 6.12.x on the old prototype. Keep the check in one place so every
  * consumer stays in sync.
+ *
+ * Distribution kernels can carry the change without a matching version:
+ * Ubuntu 6.8.0-147-generic reports 6.8.12 but has the new prototype.
+ * When building against the kernel's own wireless stack, the Makefile
+ * checks include/net/cfg80211.h and defines
+ * AICWF_CFG80211_SET_MONITOR_CHANNEL_DEV_DETECTED if it finds it.
  */
-#if AICWF_CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 12, 101)
+#if AICWF_CFG80211_VERSION_CODE >= KERNEL_VERSION(6, 12, 101) || \
+    defined(AICWF_CFG80211_SET_MONITOR_CHANNEL_DEV_DETECTED)
 #define AICWF_CFG80211_SET_MONITOR_CHANNEL_HAS_DEV
 #endif
 
